@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Mood Beverage</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+.widget {
+  max-width: 460px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 32px rgba(27, 58, 47, 0.12);
+}
+
+/* ---- HEADER ---- */
+.widget-header {
+  background: #1B3A2F;
+  padding: 28px 24px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.widget-header::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  background: rgba(200, 169, 81, 0.15);
+  border-radius: 50%;
+}
+
+.widget-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: -20px;
+  width: 80px;
+  height: 80px;
+  background: rgba(200, 169, 81, 0.10);
+  border-radius: 50%;
+}
+
+.header-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #C8A951;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+  position: relative;
+  z-index: 1;
+}
+
+.header-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- QUESTION SCREEN ---- */
+.question-screen {
+  padding: 24px;
+}
+
+.question-screen.hidden {
+  display: none;
+}
+
+.question-prompt {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1B3A2F;
+  text-align: center;
+  margin-bottom: 18px;
+  letter-spacing: -0.2px;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.option-card {
+  border-radius: 14px;
+  padding: 20px 14px 18px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.option-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(27, 58, 47, 0.14);
+  border-color: #1B3A2F;
+}
+
+.option-card:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27, 58, 47, 0.12);
+}
+
+.option-emoji {
+  font-size: 34px;
+  line-height: 1;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.option-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1B3A2F;
+  line-height: 1.35;
+  display: block;
+}
+
+.card-social   { background: #F2D4CF; }
+.card-unwind   { background: #D8D4EC; }
+.card-workout  { background: #C6D8C2; }
+.card-explore  { background: #F5E6D0; }
+
+/* ---- RESULT SCREEN ---- */
+.result-screen {
+  padding: 24px;
+  display: none;
+  animation: fadeUp 0.28s ease forwards;
+}
+
+.result-screen.visible {
+  display: block;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.result-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #1B3A2F;
+  opacity: 0.55;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.result-product-name {
+  font-size: 21px;
+  font-weight: 800;
+  color: #1B3A2F;
+  text-align: center;
+  letter-spacing: -0.4px;
+  margin-bottom: 4px;
+}
+
+.result-tagline {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.result-card {
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 12px;
+}
+
+.result-description {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+.result-price-line {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1B3A2F;
+  margin-bottom: 16px;
+}
+
+.cta-link {
+  display: block;
+  background: #1B3A2F;
+  color: #ffffff;
+  text-decoration: none;
+  text-align: center;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  transition: background 0.2s ease, transform 0.15s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.cta-link:hover {
+  background: #254d3f;
+  transform: translateY(-1px);
+}
+
+.cta-link:active {
+  transform: translateY(0);
+}
+
+.back-btn {
+  display: block;
+  width: 100%;
+  background: transparent;
+  color: #1B3A2F;
+  border: 2px solid rgba(27, 58, 47, 0.3);
+  padding: 11px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.back-btn:hover {
+  border-color: #1B3A2F;
+  background: rgba(27, 58, 47, 0.04);
+}
+
+/* ---- PROGRESS DOTS ---- */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 0 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(27, 58, 47, 0.15);
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.dot.active {
+  background: #1B3A2F;
+  transform: scale(1.3);
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 340px) {
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+  .option-emoji {
+    font-size: 28px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="widget" id="widget">
+
+  <div class="widget-header">
+    <p class="header-eyebrow">Mood Beverages</p>
+    <h2 class="header-title">What's the vibe?</h2>
+    <p class="header-sub">Tap one to find your match</p>
+  </div>
+
+  <!-- PROGRESS DOTS -->
+  <div class="dots">
+    <div class="dot active" id="dot1"></div>
+    <div class="dot" id="dot2"></div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div class="question-screen" id="questionScreen">
+    <p class="question-prompt">What are you going for tonight?</p>
+    <div class="options-grid">
+
+      <div class="option-card card-social" onclick="showResult('social')" role="button" tabindex="0" aria-label="Something social">
+        <span class="option-emoji">🥂</span>
+        <span class="option-label">Something social</span>
+      </div>
+
+      <div class="option-card card-unwind" onclick="showResult('unwind')" role="button" tabindex="0" aria-label="Wind down tonight">
+        <span class="option-emoji">🌙</span>
+        <span class="option-label">Wind down tonight</span>
+      </div>
+
+      <div class="option-card card-workout" onclick="showResult('workout')" role="button" tabindex="0" aria-label="Fuel a workout">
+        <span class="option-emoji">💪</span>
+        <span class="option-label">Fuel a workout</span>
+      </div>
+
+      <div class="option-card card-explore" onclick="showResult('explore')" role="button" tabindex="0" aria-label="Just exploring">
+        <span class="option-emoji">✨</span>
+        <span class="option-label">Just exploring</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="result-screen" id="resultScreen">
+    <p class="result-eyebrow" id="resultEyebrow"></p>
+    <p class="result-product-name" id="resultName"></p>
+    <p class="result-tagline" id="resultTagline"></p>
+    <div class="result-card" id="resultCard">
+      <p class="result-description" id="resultDesc"></p>
+      <p class="result-price-line" id="resultPrice"></p>
+      <a class="cta-link" id="resultCTA" href="#" target="_blank" rel="noopener">Shop Now &rarr;</a>
+    </div>
+    <button class="back-btn" onclick="goBack()">&#8592; Try another vibe</button>
+  </div>
+
+</div>
+
+<script>
+var picks = {
+  social: {
+    eyebrow: 'Your social pick',
+    name: 'Mood Variety Pack',
+    tagline: '5mg Delta-9 THC + 5mg CBD · Cherry Lime, Cola, Peach Mango, Strawberry Lemonade',
+    desc: 'Four flavors, pre-measured THC amounts, no prep. Start with half a can and pace yourself. Grab a 4-count and find your favorite flavor before committing to a full pack.',
+    price: '4-count Variety Pack for $19',
+    color: '#F2D4CF',
+    url: 'https://mood.com/product/variety-pack-2-sodas-2-seltzers'
+  },
+  unwind: {
+    eyebrow: 'Your nighttime pick',
+    name: 'Sleep Hot Cocoa',
+    tagline: '15mg–30mg Delta-9 THC · 12 sachets · Ashwagandha, reishi, L-theanine, magnesium',
+    desc: 'A warm sachet with a functional ingredient stack unlike anything else in this category. Mix with hot water 30 to 45 minutes before bedtime. Available in Standard (15mg) and Advanced (30mg + CBN).',
+    price: '12-count sachets from $49',
+    color: '#D8D4EC',
+    url: 'https://mood.com/product/sleep-hot-cocoa?bcc=beverages'
+  },
+  workout: {
+    eyebrow: 'Your workout pick',
+    name: 'Boost Pre-Workout',
+    tagline: '4mg–12mg Delta-9 THC · 15 sticks · Creatine, L-citrulline, L-tyrosine, betaine',
+    desc: 'Sour raspberry powder with a full performance formula alongside Delta-9 THC. Mix with water and drink 15 to 30 minutes before you train. Available in Standard (4mg) and Advanced (12mg).',
+    price: '15-count sticks for $49',
+    color: '#C6D8C2',
+    url: 'https://mood.com/product/boost-pre-workout?bcc=beverages'
+  },
+  explore: {
+    eyebrow: 'Best starting point',
+    name: 'Mood Variety Pack',
+    tagline: '5mg Delta-9 THC per can · Four flavors · No mixing required',
+    desc: 'Four different flavors in one order, low THC amounts, and a 100-day satisfaction guarantee. The lowest-risk way to find out what works for you before committing to a full pack of any single product.',
+    price: '4-count Variety Pack for $19',
+    color: '#F5E6D0',
+    url: 'https://mood.com/product/variety-pack-2-sodas-2-seltzers'
+  }
+};
+
+function showResult(key) {
+  var p = picks[key];
+  document.getElementById('resultEyebrow').textContent = p.eyebrow;
+  document.getElementById('resultName').textContent = p.name;
+  document.getElementById('resultTagline').textContent = p.tagline;
+  document.getElementById('resultDesc').textContent = p.desc;
+  document.getElementById('resultPrice').textContent = p.price;
+  document.getElementById('resultCTA').href = p.url;
+  document.getElementById('resultCard').style.background = p.color;
+  document.getElementById('questionScreen').classList.add('hidden');
+  var rs = document.getElementById('resultScreen');
+  rs.classList.remove('visible');
+  void rs.offsetWidth; // force reflow to replay animation
+  rs.classList.add('visible');
+  document.getElementById('dot1').classList.remove('active');
+  document.getElementById('dot2').classList.add('active');
+  postHeight();
+}
+
+function goBack() {
+  document.getElementById('questionScreen').classList.remove('hidden');
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('dot1').classList.add('active');
+  document.getElementById('dot2').classList.remove('active');
+  postHeight();
+}
+
+function postHeight() {
+  setTimeout(function() {
+    var h = document.getElementById('widget').offsetHeight + 40;
+    window.parent.postMessage({ type: 'mood-widget-height', height: h }, '*');
+  }, 50);
+}
+
+// Keyboard accessibility for option cards
+document.querySelectorAll('.option-card').forEach(function(card) {
+  card.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      card.click();
+    }
+  });
+});
+
+postHeight();
+</script>
+</body>
+</html>
